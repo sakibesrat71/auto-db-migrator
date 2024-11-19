@@ -49,45 +49,39 @@ class DbConnectorWindow(QWidget):
         layout.addWidget(title_label)
 
         # Username Input Field
-        self.username_input = QLineEdit(self, placeholderText="admin")
+        self.username_input = QLineEdit(self)
         self.username_input.setPlaceholderText("Username")
-        self.username_input.setText("admin")
         layout.addWidget(self.username_input)
 
         # URL Input Field
-        self.url_input = QLineEdit(self, placeholderText="jdbc:mariadb://192.168.10.38:3306/fineract_tenants_sakib")
+        self.url_input = QLineEdit(self)
         self.url_input.setPlaceholderText("URL")
-        self.url_input.setText("jdbc:mariadb://192.168.10.38:3306/fineract_tenants_sakib")
         # self.url_input.setFixedHeight(40)  # Set a fixed height to make it look normal
         layout.addWidget(self.url_input)
 
         # hostt Input Field
-        self.host_input = QLineEdit(self, placeholderText="jdbc:mariadb://192.168.10.38:3306/fineract_tenants_sakib")
+        self.host_input = QLineEdit(self)
         self.host_input.setPlaceholderText("host")
-        self.host_input.setText("192.168.10.38")
         # self.host_input.setFixedHeight(40)  # Set a fixed height to make it look normal
         layout.addWidget(self.host_input)
 
         # database Input Field
-        self.database_input = QLineEdit(self, placeholderText="jdbc:mariadb://192.168.10.38:3306/fineract_tenants_sakib")
+        self.database_input = QLineEdit(self)
         self.database_input.setPlaceholderText("database")
-        self.database_input.setText("fineract_tenants_sakib")
         # self.database_input.setFixedHeight(40)  # Set a fixed height to make it look normal
         layout.addWidget(self.database_input)
 
 
         # Password Input Field
-        self.password_input = QLineEdit(self,placeholderText="@Ne7!n5")
+        self.password_input = QLineEdit(self)
         self.password_input.setPlaceholderText("Password")
-        self.password_input.setText("@Ne7!n5")
         self.password_input.setEchoMode(QLineEdit.Password)
         layout.addWidget(self.password_input)
 
         # Driver String Input Field with Square Button
         driver_layout = QHBoxLayout()
-        self.driver_string_input = QLineEdit(self, placeholderText="org.mariadb.jdbc.Driver")
+        self.driver_string_input = QLineEdit(self)
         self.driver_string_input.setPlaceholderText("Driver String")
-        self.driver_string_input.setText("org.mariadb.jdbc.Driver")
         driver_layout.addWidget(self.driver_string_input)
 
         # Small square button to open a link
@@ -100,10 +94,8 @@ class DbConnectorWindow(QWidget):
 
         # Changelog file path input field
         file_layout = QHBoxLayout()
-        self.changelog_input = QLineEdit(self, placeholderText="db/changelog/db.changelog-master.xml")
+        self.changelog_input = QLineEdit(self)
         self.changelog_input.setPlaceholderText("Changelog File Path")
-        self.changelog_input.setText("db/changelog/db.changelog-master.xml")
-        self.changelog_input.setText("db/changelog/db.changelog-master.xml")
         self.changelog_input.setFixedHeight(30)
         file_layout.addWidget(self.changelog_input)
 
