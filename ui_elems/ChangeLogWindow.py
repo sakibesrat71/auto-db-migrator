@@ -1,18 +1,20 @@
 # change_log_window.py
 
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QFileDialog,QMessageBox
 from PyQt5.QtCore import Qt
-from logics.ChangeLogComparator import ChangeLogComparator
+from logics.ChangeLogComparator import LiquibaseChangelogComparer
+from logics.PrevDbStateChanger import PrevDbStateChanger
+from logics.DataClass import DataClass
 
 class ChangeLogWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        self.liquibase_initiator = None
         self.current_xml = None  # To store the current XML file path
         self.previous_xml = None  # To store the previous XML file path
 
-        self.initUI()
+        # self.initUI()
 
     def initUI(self):
         # Create a main vertical layout
@@ -27,7 +29,10 @@ class ChangeLogWindow(QWidget):
         self.previous_btn = QPushButton("Your previous change log")
 
         # Create labels to display file names under each button
-        self.current_label = QLabel("No file selected")
+        if (self.current_xml is not None):
+            self.current_label = QLabel("Selected: " + self.current_xml)
+        else:
+            self.current_label = QLabel("No file selected")
         self.previous_label = QLabel("No file selected")
 
         # Connect buttons to the file dialog functions
@@ -61,6 +66,12 @@ class ChangeLogWindow(QWidget):
         self.setLayout(vbox)
         self.setWindowTitle("Change Log Selector")
         self.show()
+    
+    def receive_liquibase_initiator(self, liquibase_initiator):
+        # Store the received liquibase_initiator object in the class
+        self.liquibase_initiator = liquibase_initiator
+        # Now you can use self.liquibase_initiator in this class as needed
+        print("Received liquibase_initiator:", self.liquibase_initiator)
 
     def select_current_xml(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Select Current Change Log", "", "XML files (*.xml)")
@@ -71,11 +82,15 @@ class ChangeLogWindow(QWidget):
             self.check_enable_generate_btn()  # Check if both files are selected to enable the migration button
 
     def select_previous_xml(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Select Previous Change Log", "", "XML files (*.xml)")
-        if file_name:
-            self.previous_xml = file_name  # Store the selected file path
+        # file_name, _ = QFileDialog.getOpenFileName(self, "Select Previous Change Log", "", "XML files (*.xml)")
+        # if file_name:
+        #     self.previous_xml = file_name  # Store the selected file path
+        #     self.previous_label.setText(
+        #         f"Selected: {file_name.split('/')[-1]}")  # Display the file name under the button
+            PrevDbStateChanger.update_changelog_file_and_save(DataClass.get_instance().get_liquibase_initiator())
+            self.previous_xml = DataClass.get_instance().get_temp_gen_xml_path()
             self.previous_label.setText(
-                f"Selected: {file_name.split('/')[-1]}")  # Display the file name under the button
+                 f"Selected: {DataClass.get_instance().get_temp_gen_xml_path().split('/')[-1]}")  # Display the file name under the button
             self.check_enable_generate_btn()  # Check if both files are selected to enable the migration button
 
     def check_enable_generate_btn(self):
@@ -88,17 +103,36 @@ class ChangeLogWindow(QWidget):
         # Placeholder logic to indicate this function is called
         print(f"Generating migration script from:\nCurrent: {self.current_xml}\nPrevious: {self.previous_xml}")
 
-        previous_changelog_path = self.previous_xml # Replace with the actual path to the previous XML
+        previous_changelog_path = self.previous_xml  # Replace with the actual path to the previous XML
         current_changelog_path = self.current_xml  # Replace with the actual path to the current XML
+
         try:
-            comparator = ChangeLogComparator(previous_changelog_path, current_changelog_path)
-            # comparator.compare_changelogs()
+            comparator = LiquibaseChangelogComparer(previous_changelog_path, current_changelog_path)
             new_changelog = comparator.compare_and_generate()
 
-            # Print the new XML to see the generated migration changelog
-            print(new_changelog)
+            # Open a file dialog for the user to select the export location
+            options = QFileDialog.Options()
+            file_path, _ = QFileDialog.getSaveFileName(self, "Save Migration Script", "",
+                                                       "XML Files (*.xml);;All Files (*)", options=options)
+
+            # If the user selects a file path
+            if file_path:
+                with open(file_path, "w") as file:
+                    file.write(new_changelog)
+
+                # Display success message
+                QMessageBox.information(self, "Success", "Migration script saved successfully!")
+                db_cursor = DataClass.get_instance().get_temp_db_cursor()
+                db_cursor.execute(f"DROP DATABASE {DataClass.get_instance().get_temp_db_name()}")
+                print("Temporary database dropped successfully.")
+                db_cursor.close()
+
+            else:
+                print("Save operation was canceled.")
+
         except Exception as e:
             print(f"Error generating migration script: {e}")
+            # QMessageBox.critical(self, "Error", f"Error generating migration script: {e}")
 
 
         # Print the new XML to see the generated migration changelog
