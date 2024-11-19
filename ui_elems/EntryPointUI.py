@@ -7,7 +7,7 @@ class MotherWindow(QMainWindow):
         super().__init__()
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self):  
         self.setWindowTitle('Mother Window')
         self.setGeometry(100, 100, 600, 400)
 

@@ -7,7 +7,7 @@ from logics.ChangeLogComparator import LiquibaseChangelogComparer
 from logics.PrevDbStateChanger import PrevDbStateChanger
 from logics.DataClass import DataClass
 
-class ChangeLogWindow(QWidget):
+class ChangeLogWindow(QWidget):   
     def __init__(self,parent=None):
         super().__init__(parent)
         self.liquibase_initiator = None
