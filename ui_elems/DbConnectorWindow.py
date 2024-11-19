@@ -169,7 +169,7 @@ class DbConnectorWindow(QWidget):
         self.url_input.clear()
         self.username_input.clear()
         self.password_input.clear()
-        self.driver_string_input.clear()
+        self.driver_string_input.clear()  
         self.error_label.clear()
         self.changelog_input.clear()
         self.host_input.clear()
